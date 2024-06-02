@@ -21,8 +21,8 @@ async function main() {
   console.log("Using chainId:", chainId);
 
   // Fetch deployed tokens
-  const exchangeToken = await ethers.getContractAt("Token", config[chainId].exchangeToken.address);
-  console.log(`ET Token fetched:`, await exchangeToken.getAddress());
+  const pulseToken = await ethers.getContractAt("Token", config[chainId].pulseToken.address);
+  console.log(`PT Token fetched:`, await pulseToken.getAddress());
 
   const mETH = await ethers.getContractAt("Token", config[chainId].mETH.address);
   console.log(`mETH Token fetched: `, await mETH.getAddress());
@@ -50,18 +50,18 @@ async function main() {
 
 
   const exchangeAddress = await exchange.getAddress();
-  const exchangeTokenAddress = await exchangeToken.getAddress();
+  const pulseTokenAddress = await pulseToken.getAddress();
   const mETHAddress = await mETH.getAddress();
 
-  // user1 aprove 10,000 ET token to  exchange ....
-  transaction = await exchangeToken.connect(user1).approve(exchangeAddress, amount);
+  // user1 aprove 10,000 PT token to  exchange ....
+  transaction = await pulseToken.connect(user1).approve(exchangeAddress, amount);
   await transaction.wait();
-  console.log(`Approved ${amount} ET token from ${user1.address}`);
+  console.log(`Approved ${amount} PT token from ${user1.address}`);
 
-  // user1 deposits 10,000 ET token to exchange........
-  transaction = await exchange.connect(user1).depositToken(exchangeTokenAddress, amount);
+  // user1 deposits 10,000 PT token to exchange........
+  transaction = await exchange.connect(user1).depositToken(pulseTokenAddress, amount);
   await transaction.wait();
-  console.log(`Deposited ${amount} ET token from ${user1.address}\n `);
+  console.log(`Deposited ${amount} PT token from ${user1.address}\n `);
 
   // user2 approve mETH to exchange ....
   transaction = await mETH.connect(user2).approve(exchangeAddress, amount);
@@ -80,7 +80,7 @@ async function main() {
 
   // User1 make order to get tokens
   let orderId;
-  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(10), exchangeTokenAddress, etherValue(5));
+  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(10), pulseTokenAddress, etherValue(5));
   result = await transaction.wait();
   // console.log(result);
   console.log(`Make order from ${user1.address}`);
@@ -100,7 +100,7 @@ async function main() {
   ////////////////////////////////////////////////////
 
   // User1 make order 
-  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(100), exchangeTokenAddress, etherValue(10));
+  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(100), pulseTokenAddress, etherValue(10));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -115,7 +115,7 @@ async function main() {
 
 
   // User1 make another order 
-  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(50), exchangeTokenAddress, etherValue(15));
+  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(50), pulseTokenAddress, etherValue(15));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -129,7 +129,7 @@ async function main() {
   await wait(1);
 
   // User1 make final order 
-  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(200), exchangeTokenAddress, etherValue(20));
+  transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(200), pulseTokenAddress, etherValue(20));
   result = await transaction.wait();
   console.log(`Made order from ${user1.address}`);
 
@@ -144,7 +144,7 @@ async function main() {
 
   // user 1 makes 10 orders
   for (let i = 1; i <= 10; i++) {
-    transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(10 * i), exchangeTokenAddress, etherValue(10));
+    transaction = await exchange.connect(user1).makeOrder(mETHAddress, etherValue(10 * i), pulseTokenAddress, etherValue(10));
     await transaction.wait();
 
     console.log(`Made order from ${user1.address}`);

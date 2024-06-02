@@ -7,9 +7,9 @@ async function main() {
     console.log(`Account fetched:\n ${accounts[0].address} \n ${accounts[1].address} \n ${accounts[2].address}`);
 
 
-    const exchangetoken = await ethers.deployContract("Token", ["Exchange Token", "ET", 1000000]);
-    await exchangetoken.waitForDeployment();
-    console.log(`Exchange Token deployed to:  ${exchangetoken.target}`);
+    const pulsetoken = await ethers.deployContract("Token", ["Pulse Token", "PT", 1000000]);
+    await pulsetoken.waitForDeployment();
+    console.log(`Pulse Token deployed to:  ${pulsetoken.target}`);
 
     const mETH = await ethers.deployContract("Token", ["mETH", "mETH", 1000000]);
     await mETH.waitForDeployment();
