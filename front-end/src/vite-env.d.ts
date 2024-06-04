@@ -1,4 +1,7 @@
-/// <reference types="vite/client" />
-interface Window {
-  ethereum?: import('ethers').providers.ExternalProvider;
-}
+/// <reference types="vite/client" /> 
+import { ExternalProvider } from "@ethersproject/providers";
+declare global {
+  interface Window {
+    ethereum?: ExternalProvider;
+  }
+} 
