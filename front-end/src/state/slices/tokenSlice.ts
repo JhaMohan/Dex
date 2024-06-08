@@ -1,32 +1,54 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-interface tokenState {
+interface TokenState {
   loaded: boolean;
-  contract: Object | null,
-  symbol: string
+  contracts: Object[],
+  symbols: string[]
 }
 
-const initialState: tokenState = {
+const initialState: TokenState = {
   loaded: false,
-  contract: null,
-  symbol: ""
+  contracts: [],
+  symbols: []
 }
 
+
+export interface TokenData {
+  token: Object;
+  symbol: string;
+}
 
 const tokenSlice = createSlice({
-  name: 'token',
+  name: 'tokens',
   initialState,
   reducers: {
-    TOKEN_LOADED: (state = initialState, action) => {
+    TOKEN_1_LOADED: (state = initialState, action: PayloadAction<TokenData>) => {
       return {
         ...state,
         loaded: true,
-        contract: action.token,
-        symbol: action.symbol
+        contracts: [...state.contracts, action.payload.token],
+        symbols: [...state.symbols, action.payload.symbol]
       }
-    }
+    },
+    TOKEN_2_LOADED: (state = initialState, action: PayloadAction<TokenData>) => {
+      return {
+        ...state,
+        loaded: true,
+        contracts: [...state.contracts, action.payload.token],
+        symbols: [...state.symbols, action.payload.symbol]
+      }
+    },
+    TOKEN_3_LOADED: (state = initialState, action: PayloadAction<TokenData>) => {
+      return {
+        ...state,
+        loaded: true,
+        contracts: [...state.contracts, action.payload.token],
+        symbols: [...state.symbols, action.payload.symbol]
+      }
+    },
+
   }
 })
 
-export const { TOKEN_LOADED } = tokenSlice.actions;
+export const { TOKEN_1_LOADED, TOKEN_2_LOADED, TOKEN_3_LOADED } = tokenSlice.actions;
 export default tokenSlice.reducer;

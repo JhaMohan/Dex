@@ -1,31 +1,38 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { ethers } from "ethers";
 import config from '../config.json';
 import {
   loadProvider,
   loadNetwork,
   loadAccount,
-  loadToken
+  loadTokens,
+  loadExchange
 } from '../state/interaction'
+import { useAppDispatch } from "../state/hooks";
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const loadBlockchainData = async () => {
-    const account = await loadAccount(dispatch);
-    console.log(account);
+
 
     //Connect Ethers to blockchain
     const provider = await loadProvider(dispatch);
-    console.log(provider);
-    const chainId: bigint = await loadNetwork(provider, dispatch);
 
+    // fetch current network's chainId(e.g: hardhat 31337, sepolia: 11155111)
+    const chainId = await loadNetwork(provider, dispatch);
 
-    const contract = await loadToken(provider, config[chainId].pulseToken.address, dispatch);
-    console.log(await contract.getAddress());
-    const sym = await contract.symbol();
-    console.log(sym)
+    // Fetch current account and balance from metamask
+    await loadAccount(provider, dispatch);
+
+    //Load token smart contract
+    const pulseToken = config[chainId as keyof typeof config].pulseToken;
+    const mETH = config[chainId as keyof typeof config].mETH;
+    const mDAI = config[chainId as keyof typeof config].mDAI;
+    await loadTokens(provider, [pulseToken.address, mETH.address, mDAI.address], dispatch);
+
+    //Load exchange smart contract
+    const exchange = config[chainId as keyof typeof config].exchange;
+    await loadExchange(provider, exchange.address, dispatch);
 
   }
 

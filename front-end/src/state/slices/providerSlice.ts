@@ -1,15 +1,18 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { ethers } from 'ethers';
 
-interface providerState {
-  connection: Object | null;
+interface ProviderState {
+  connection: ethers.BrowserProvider;
   chainId: number;
-  account: string
+  account: string;
+  balance: string;
 }
 
-const initialState: providerState = {
-  connection: null,
+const initialState: ProviderState = {
+  connection: new ethers.BrowserProvider(window.ethereum),
   chainId: 0,
-  account: ''
+  account: '',
+  balance: '',
 }
 
 
@@ -23,26 +26,32 @@ const providerSlice = createSlice({
   name: 'provider',
   initialState,
   reducers: {
-    PROVIDER_LOADED: (state = initialState, action: PayloadAction<SomeObject>) => {
+    PROVIDER_LOADED: (state, action: PayloadAction<ethers.BrowserProvider>) => {
       return {
         ...state,
-        connection: action.connection
+        connection: action.payload
       }
     },
-    NETWORK_LOADED: (state: any, action: PayloadAction<SomeObject>) => {
+    NETWORK_LOADED: (state, action: PayloadAction<number>) => {
       return {
         ...state,
-        chainId: action.chainId
+        chainId: action.payload
       }
     },
-    ACCOUNT_LOADED: (state, action: PayloadAction<SomeObject>) => {
+    ACCOUNT_LOADED: (state, action: PayloadAction<string>) => {
       return {
         ...state,
-        account: action.account
+        account: action.payload
+      }
+    },
+    BALANCE_LOADED: (state, action: PayloadAction<string>) => {
+      return {
+        ...state,
+        balance: action.payload,
       }
     }
   }
 })
 
-export const { PROVIDER_LOADED, NETWORK_LOADED, ACCOUNT_LOADED } = providerSlice.actions;
+export const { PROVIDER_LOADED, NETWORK_LOADED, ACCOUNT_LOADED, BALANCE_LOADED } = providerSlice.actions;
 export default providerSlice.reducer;

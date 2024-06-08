@@ -1,16 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit'
 import providerReducer from './slices/providerSlice'
 import tokenReducer from './slices/tokenSlice'
+import exchangeReducer from './slices/exchangeSlice'
 
 export const store = configureStore({
   reducer: {
     provider: providerReducer,
-    token: tokenReducer
+    tokens: tokenReducer,
+    exchange: exchangeReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
+
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
