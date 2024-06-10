@@ -365,8 +365,14 @@ small {
 /* ------------------------------------------------------ */
 /* Images */
 
+.ethlogo {
+  width: 15px;
+  height: auto;
+  margin: 0 0.5em 0 0;
+}
+
 .logo {
-  width: 35px;
+  width: 30px;
   height: auto;
   margin: 0 0.5em 0 0;
 }

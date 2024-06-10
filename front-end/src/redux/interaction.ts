@@ -16,7 +16,7 @@ export const loadProvider = async (dispatch: Dispatch) => {
 
 export const loadNetwork = async (provider: ethers.BrowserProvider, dispatch: Dispatch) => {
   let { chainId } = await provider.getNetwork();
-  dispatch(NETWORK_LOADED(Number(chainId)));
+  dispatch(NETWORK_LOADED(chainId.toString()));
 
   return chainId.toString();
 }

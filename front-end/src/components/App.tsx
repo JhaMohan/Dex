@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import config from '../config.json';
 import {
   loadProvider,
@@ -6,10 +6,11 @@ import {
   loadAccount,
   loadTokens,
   loadExchange
-} from '../state/interaction'
-import { useAppDispatch } from "../state/hooks";
+} from '../redux/interaction'
+import { useAppDispatch } from "../redux/hooks";
+import Navbar from "./Navbar";
 
-function App() {
+const App: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const loadBlockchainData = async () => {
@@ -20,9 +21,18 @@ function App() {
 
     // fetch current network's chainId(e.g: hardhat 31337, sepolia: 11155111)
     const chainId = await loadNetwork(provider, dispatch);
+    console.log(chainId);
 
-    // Fetch current account and balance from metamask
-    await loadAccount(provider, dispatch);
+    // Reaload page when network changes
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    })
+
+    // Fetch current account and balance from metamask when account changed
+    window.ethereum.on('accountsChanged', () => {
+      loadAccount(provider, dispatch);
+    })
+    // await loadAccount(provider, dispatch);
 
     //Load token smart contract
     const pulseToken = config[chainId as keyof typeof config].pulseToken;
@@ -43,6 +53,7 @@ function App() {
 
   return (
     <div>
+      <Navbar />
       {/* Navbar */}
 
       <main className="exchange grid">
@@ -67,7 +78,7 @@ function App() {
 
         </section>
       </main>
-    </div>
+    </div >
   );
 }
 

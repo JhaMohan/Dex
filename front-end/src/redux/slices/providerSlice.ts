@@ -3,14 +3,14 @@ import { ethers } from 'ethers';
 
 interface ProviderState {
   connection: ethers.BrowserProvider;
-  chainId: number;
+  chainId: string;
   account: string;
   balance: string;
 }
 
 const initialState: ProviderState = {
   connection: new ethers.BrowserProvider(window.ethereum),
-  chainId: 0,
+  chainId: '',
   account: '',
   balance: '',
 }
@@ -32,7 +32,7 @@ const providerSlice = createSlice({
         connection: action.payload
       }
     },
-    NETWORK_LOADED: (state, action: PayloadAction<number>) => {
+    NETWORK_LOADED: (state, action: PayloadAction<string>) => {
       return {
         ...state,
         chainId: action.payload
