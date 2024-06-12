@@ -3,7 +3,7 @@ import TOKEN_ABI from '../abis/Token.json';
 import EXCHAGE_ABI from '../abis/Exchange.json'
 import { PROVIDER_LOADED, NETWORK_LOADED, ACCOUNT_LOADED, BALANCE_LOADED } from './slices/providerSlice'
 import { Dispatch } from '@reduxjs/toolkit';
-import { TOKEN_1_LOADED, TOKEN_2_LOADED, TOKEN_3_LOADED } from './slices/tokenSlice';
+import { TOKEN_1_LOADED, TOKEN_2_LOADED } from './slices/tokenSlice';
 import { EXCHANGE_LOADED } from './slices/exchangeSlice';
 
 export const loadProvider = async (dispatch: Dispatch) => {
@@ -45,11 +45,6 @@ export const loadTokens = async (provider: ethers.BrowserProvider, addresses: st
   symbol = await token.symbol();
 
   dispatch(TOKEN_2_LOADED({ token, symbol }));
-
-  token = new ethers.Contract(addresses[2], TOKEN_ABI, provider);
-  symbol = await token.symbol();
-
-  dispatch(TOKEN_3_LOADED({ token, symbol }));
 
   return token;
 }

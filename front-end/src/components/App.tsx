@@ -9,6 +9,7 @@ import {
 } from '../redux/interaction'
 import { useAppDispatch } from "../redux/hooks";
 import Navbar from "./Navbar";
+import Markets from "./Markets"
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,8 +38,7 @@ const App: React.FC = () => {
     //Load token smart contract
     const pulseToken = config[chainId as keyof typeof config].pulseToken;
     const mETH = config[chainId as keyof typeof config].mETH;
-    const mDAI = config[chainId as keyof typeof config].mDAI;
-    await loadTokens(provider, [pulseToken.address, mETH.address, mDAI.address], dispatch);
+    await loadTokens(provider, [pulseToken.address, mETH.address], dispatch);
 
     //Load exchange smart contract
     const exchange = config[chainId as keyof typeof config].exchange;
@@ -54,12 +54,12 @@ const App: React.FC = () => {
   return (
     <div>
       <Navbar />
-      {/* Navbar */}
+
 
       <main className="exchange grid">
         <section className="exchange__section--left grid">
 
-          {/* Market */}
+          <Markets />
 
           {/* Balance */}
 

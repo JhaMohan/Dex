@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ChangeEvent } from "react"
 import logo from '../assets/logo.png'
 import eth from '../assets/eth.png'
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
     await loadAccount(provider, dispatch);
   }
 
-  const networkHandler = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const networkHandler = async (e: ChangeEvent<HTMLSelectElement>) => {
     console.log(e.target.value);
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
         <img src={eth} alt="ETH logo" className="Eth ethlogo"></img>
 
         {chainId &&
-          <select name="networks" id="networks" value={config[chainId as keyof typeof config] ? `0x${Number(chainId).toString(16)}` : `0`} onChange={networkHandler}>
+          <select name="networks" id="networks" value={config[chainId as keyof typeof config] ? `0x${Number(chainId).toString(16)}` : `0`} onChange={(e) => networkHandler(e)}>
             <option value="0" disabled>Select Network</option>
             <option value="0x7A69">Localhost</option>
             <option value="0xAA36A7">Sepolia</option>
