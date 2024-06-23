@@ -11,7 +11,6 @@ const Markets: React.FC = () => {
 
   const marketHandler = async (e: ChangeEvent<HTMLSelectElement>) => {
     const addresses = e.target.value.split(',');
-    // console.log(address);
     await loadTokens(provider, addresses, dispatch);
   }
   return (

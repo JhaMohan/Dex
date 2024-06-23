@@ -5,14 +5,17 @@ import {
   loadNetwork,
   loadAccount,
   loadTokens,
-  loadExchange
+  loadExchange,
+  subscribeToEvents
 } from '../redux/interaction'
-import { useAppDispatch } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Navbar from "./Navbar";
 import Markets from "./Markets"
+import Balance from "./Balance";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
+
 
   const loadBlockchainData = async () => {
 
@@ -41,8 +44,11 @@ const App: React.FC = () => {
     await loadTokens(provider, [pulseToken.address, mETH.address], dispatch);
 
     //Load exchange smart contract
-    const exchange = config[chainId as keyof typeof config].exchange;
-    await loadExchange(provider, exchange.address, dispatch);
+    const exchangeConfig = config[chainId as keyof typeof config].exchange;
+    const exchange = await loadExchange(provider, exchangeConfig.address, dispatch);
+
+    // subscribe to events
+    await subscribeToEvents(exchange, dispatch);
 
   }
 
@@ -61,8 +67,7 @@ const App: React.FC = () => {
 
           <Markets />
 
-          {/* Balance */}
-
+          <Balance />
           {/* Order */}
 
         </section>
