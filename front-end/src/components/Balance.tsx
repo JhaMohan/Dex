@@ -28,9 +28,9 @@ const Balance: React.FC = () => {
   const tabHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
 
     const target = e.target as HTMLButtonElement;
-    if (depositeRef.current && target.className !== depositeRef.current.className) {
+    if (depositRef.current && target.className !== depositRef.current.className) {
       target.className = "tab tab--active";
-      depositeRef.current.className = "tab";
+      depositRef.current.className = "tab";
       setDeposit(false);
     } else if (withdrawRef.current) {
       target.className = "tab tab--active";
@@ -69,7 +69,20 @@ const Balance: React.FC = () => {
 
   }
 
-  const depositeRef = useRef<HTMLButtonElement>(null);
+  const withdrawHandler = async (e: React.FormEvent<HTMLFormElement>, token: Contract) => {
+    e.preventDefault();
+
+    if (token.target === tokens[0].target) {
+      transferTokens(provider, exchange, "Withdraw", token, token1TransferAmount, dispatch);
+      setToken1TransferAmount('');
+    } else {
+      transferTokens(provider, exchange, "Withdraw", token, token2TransferAmount, dispatch);
+      setToken2TransferAmount('');
+    }
+
+  }
+
+  const depositRef = useRef<HTMLButtonElement>(null);
   const withdrawRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -83,7 +96,7 @@ const Balance: React.FC = () => {
       <div className="component__header flex-between">
         <h2>Balance</h2>
         <div className="tabs">
-          <button onClick={tabHandler} ref={depositeRef} className="tab tab--active">Deposite</button>
+          <button onClick={tabHandler} ref={depositRef} className="tab tab--active">Deposite</button>
           <button onClick={tabHandler} ref={withdrawRef} className="tab">Withdraw</button>
         </div>
       </div>
@@ -95,7 +108,7 @@ const Balance: React.FC = () => {
           <p><small>Wallet</small><br />{tokenBalances?.[0]}</p>
           <p><small>Exchange</small><br />{exchangeBalances?.[0]}</p>
         </div>
-        <form onSubmit={(e) => depositeHandler(e, tokens[0])}>
+        <form onSubmit={isDeposit ? (e) => depositeHandler(e, tokens[0]) : (e) => withdrawHandler(e, tokens[0])}>
           <label htmlFor="token0">{symbols?.[0]} Amount</label>
           <input
             type="text"
@@ -105,7 +118,7 @@ const Balance: React.FC = () => {
             onChange={(e) => amountHandler(e, tokens[0])} />
           <button className="button" type="submit" >
 
-            {isDeposit ? <span>Deposite</span> : <span>Withdraw</span>}
+            {isDeposit ? <span>Deposit</span> : <span>Withdraw</span>}
 
           </button>
         </form>
@@ -121,7 +134,7 @@ const Balance: React.FC = () => {
           <p><small>Wallet</small><br />{tokenBalances?.[1]}</p>
           <p><small>Exchange</small><br />{exchangeBalances?.[1]}</p>
         </div>
-        <form onSubmit={(e) => depositeHandler(e, tokens[1])}>
+        <form onSubmit={isDeposit ? (e) => depositeHandler(e, tokens[1]) : (e) => withdrawHandler(e, tokens[1])}>
           <label htmlFor="token1">{symbols?.[1]} Amount</label>
           <input
             type="text"
@@ -132,7 +145,7 @@ const Balance: React.FC = () => {
           />
           <button className="button" type="submit">
             <span>
-              {isDeposit ? 'Deposite' : 'Withdraw'}
+              {isDeposit ? 'Deposit' : 'Withdraw'}
             </span>
           </button>
         </form>
