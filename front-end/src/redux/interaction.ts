@@ -60,7 +60,6 @@ export const loadExchange = async (provider: ethers.BrowserProvider, address: st
 
 export const subscribeToEvents = async (exchange: ethers.Contract, dispatch: Dispatch) => {
   exchange.on('Deposit', (token, user, amount: string, balance, event) => {
-    console.log("come to subscription", event);
     dispatch(TRANSFER_SUCESS(event.eventName));
   })
 }

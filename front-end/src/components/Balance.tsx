@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState, useRef } from "react";
 import pt from '../assets/pt.svg';
+import eth from '../assets/eth.png'
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { loadBalances, transferTokens } from "../redux/interaction";
 import { Contract } from "ethers";
 
 const Balance: React.FC = () => {
 
-  const [token1TransferAmount, setToken1TransferAmount] = useState('')
+  const [isDeposit, setDeposit] = useState(true);
+  const [token1TransferAmount, setToken1TransferAmount] = useState('');
+  const [token2TransferAmount, setToken2TransferAmount] = useState('');
 
   const provider = useAppSelector((state) => state.provider.connection);
   const account = useAppSelector((state) => state.provider.account);
@@ -21,9 +24,26 @@ const Balance: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const amountHandler = async (e: React.ChangeEvent<HTMLInputElement>, token: Contract) => {
-    if (token.address === tokens[0].address) {
+
+  const tabHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+    const target = e.target as HTMLButtonElement;
+    if (depositeRef.current && target.className !== depositeRef.current.className) {
+      target.className = "tab tab--active";
+      depositeRef.current.className = "tab";
+      setDeposit(false);
+    } else if (withdrawRef.current) {
+      target.className = "tab tab--active";
+      withdrawRef.current.className = "tab";
+      setDeposit(true);
+    }
+  }
+
+  const amountHandler = async (e: ChangeEvent<HTMLInputElement>, token: Contract) => {
+    if (token.target === tokens[0].target) {
       setToken1TransferAmount(e.target.value);
+    } else {
+      setToken2TransferAmount(e.target.value);
     }
   }
 
@@ -38,11 +58,19 @@ const Balance: React.FC = () => {
 
   const depositeHandler = async (e: React.FormEvent<HTMLFormElement>, token: Contract) => {
     e.preventDefault();
-    if (token.address === tokens[0].address) {
+
+    if (token.target === tokens[0].target) {
       transferTokens(provider, exchange, "Deposit", token, token1TransferAmount, dispatch);
       setToken1TransferAmount('');
+    } else {
+      transferTokens(provider, exchange, "Deposit", token, token2TransferAmount, dispatch);
+      setToken2TransferAmount('');
     }
+
   }
+
+  const depositeRef = useRef<HTMLButtonElement>(null);
+  const withdrawRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (exchange && tokens[0] && tokens[1] && account) {
@@ -55,8 +83,8 @@ const Balance: React.FC = () => {
       <div className="component__header flex-between">
         <h2>Balance</h2>
         <div className="tabs">
-          <button className="tab tab--active">Deposite</button>
-          <button className="tab">Withdraw</button>
+          <button onClick={tabHandler} ref={depositeRef} className="tab tab--active">Deposite</button>
+          <button onClick={tabHandler} ref={withdrawRef} className="tab">Withdraw</button>
         </div>
       </div>
 
@@ -76,7 +104,9 @@ const Balance: React.FC = () => {
             value={token1TransferAmount}
             onChange={(e) => amountHandler(e, tokens[0])} />
           <button className="button" type="submit" >
-            <span>Deposite</span>
+
+            {isDeposit ? <span>Deposite</span> : <span>Withdraw</span>}
+
           </button>
         </form>
       </div>
@@ -85,14 +115,25 @@ const Balance: React.FC = () => {
 
       {/* Deposit/Withdraw component 2 (mETH) */}
       <div className="exchange__transfers--form">
-        <div className="flex-between">
 
+        <div className="flex-between">
+          <p><small>Token</small><br /><img width="20" height="20" src={eth} alt="Token logo" />{symbols?.[1]}</p>
+          <p><small>Wallet</small><br />{tokenBalances?.[1]}</p>
+          <p><small>Exchange</small><br />{exchangeBalances?.[1]}</p>
         </div>
-        <form>
-          <label htmlFor="token1"></label>
-          <input type="text" id="token1" placeholder="0.000" />
+        <form onSubmit={(e) => depositeHandler(e, tokens[1])}>
+          <label htmlFor="token1">{symbols?.[1]} Amount</label>
+          <input
+            type="text"
+            id="token1"
+            placeholder="0.000"
+            value={token2TransferAmount}
+            onChange={(e) => amountHandler(e, tokens[1])}
+          />
           <button className="button" type="submit">
-            <span></span>
+            <span>
+              {isDeposit ? 'Deposite' : 'Withdraw'}
+            </span>
           </button>
         </form>
       </div>
