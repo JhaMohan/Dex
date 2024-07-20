@@ -14,6 +14,7 @@ interface ExchangeState {
   balances: string[];
   transaction: TransactionState;
   transferInProgress: boolean;
+  allOrders: {},
   events: string[],
   isError: boolean
 }
@@ -28,6 +29,10 @@ const initialState: ExchangeState = {
     transactionType: '',
     isPending: false,
     isSuccessful: false
+  },
+  allOrders: {
+    loaded: false,
+    data: []
   },
   transferInProgress: false,
   isError: false,
@@ -99,9 +104,61 @@ const exchangeSlice = createSlice({
       }
     },
 
+    //----------------------------------------------------------------
+    // BUY && SELL
+    //----------------------------------------------------------------
+    // TRANSFER CASES (DEPOSIT & WITHDRAWS)
+
+    NEW_ORDER_REQUEST: (state) => {
+      return {
+        ...state,
+        transaction: {
+          transactionType: 'New Order',
+          isPending: true,
+          isSuccessful: false,
+        },
+        transferInProgress: true
+      }
+    },
+    NEW_ORDER_SUCCESS: (state, action) => {
+      let index = state.allOrders.data.findIndex((item) => item.id === action.payload.order.id);
+      let data;
+      if (index !== -1) {
+        data = state.allOrders.data;
+      } else {
+        data = [...state.allOrders.data, action.payload.order];
+      }
+      return {
+        ...state,
+        allOrders: {
+          ...state.allOrders,
+          loaded: true,
+          data
+        },
+        transaction: {
+          transactionType: 'New Order',
+          isPending: false,
+          isSuccessful: true,
+        },
+        transferInProgress: false,
+        events: [action.payload.eventName, ...state.events]
+      }
+    },
+    NEW_ORDER_FAIL: (state) => {
+      return {
+        ...state,
+        transaction: {
+          transactionType: 'New Order',
+          isPending: false,
+          isSuccessful: false,
+          isError: true
+        },
+        transferInProgress: false
+      }
+    },
 
   },
 })
 
-export const { EXCHANGE_LOADED, EXCHANGE_TOKEN_1_BALANCE_LOADED, EXCHANGE_TOKEN_2_BALANCE_LOADED, TRANSFER_REQUEST, TRANSFER_SUCESS, TRANSFER_FAIL } = exchangeSlice.actions;
+export const { EXCHANGE_LOADED, EXCHANGE_TOKEN_1_BALANCE_LOADED, EXCHANGE_TOKEN_2_BALANCE_LOADED, TRANSFER_REQUEST, TRANSFER_SUCESS, TRANSFER_FAIL, NEW_ORDER_SUCCESS, NEW_ORDER_FAIL, NEW_ORDER_REQUEST } = exchangeSlice.actions;
 export default exchangeSlice.reducer;

@@ -7,7 +7,7 @@ import { Contract } from "ethers";
 
 const Balance: React.FC = () => {
 
-  const [isDeposit, setDeposit] = useState(true);
+  const [isDeposit, setIsDeposit] = useState(true);
   const [token1TransferAmount, setToken1TransferAmount] = useState('');
   const [token2TransferAmount, setToken2TransferAmount] = useState('');
 
@@ -31,11 +31,11 @@ const Balance: React.FC = () => {
     if (depositRef.current && target.className !== depositRef.current.className) {
       target.className = "tab tab--active";
       depositRef.current.className = "tab";
-      setDeposit(false);
+      setIsDeposit(false);
     } else if (withdrawRef.current) {
       target.className = "tab tab--active";
       withdrawRef.current.className = "tab";
-      setDeposit(true);
+      setIsDeposit(true);
     }
   }
 

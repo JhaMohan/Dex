@@ -4,7 +4,7 @@ import EXCHAGE_ABI from '../abis/Exchange.json'
 import { PROVIDER_LOADED, NETWORK_LOADED, ACCOUNT_LOADED, BALANCE_LOADED } from './slices/providerSlice'
 import { Dispatch } from '@reduxjs/toolkit';
 import { TOKEN_1_BALANCE_LOADED, TOKEN_1_LOADED, TOKEN_2_LOADED, TOKEN_2_BALANCE_LOADED } from './slices/tokenSlice';
-import { EXCHANGE_LOADED, EXCHANGE_TOKEN_1_BALANCE_LOADED, EXCHANGE_TOKEN_2_BALANCE_LOADED, TRANSFER_FAIL, TRANSFER_REQUEST, TRANSFER_SUCESS } from './slices/exchangeSlice';
+import { EXCHANGE_LOADED, EXCHANGE_TOKEN_1_BALANCE_LOADED, EXCHANGE_TOKEN_2_BALANCE_LOADED, TRANSFER_FAIL, TRANSFER_REQUEST, TRANSFER_SUCESS, NEW_ORDER_SUCCESS, NEW_ORDER_REQUEST, NEW_ORDER_FAIL } from './slices/exchangeSlice';
 import { Contract } from 'ethers';
 
 export const loadProvider = async (dispatch: Dispatch) => {
@@ -65,6 +65,12 @@ export const subscribeToEvents = async (exchange: ethers.Contract, dispatch: Dis
   exchange.on('Withdraw', (token, user, amount: string, balance, event) => {
     dispatch(TRANSFER_SUCESS(event.eventName));
   })
+
+  exchange.on('Order', (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp, event) => {
+    const order = (event.args.toString());
+    const eventName = event.eventName;
+    dispatch(NEW_ORDER_SUCCESS({ order, eventName }));
+  })
 }
 
 
@@ -119,8 +125,53 @@ export const transferTokens = async (provider: ethers.BrowserProvider, exchange:
 
 
   } catch (error) {
-    dispatch(TRANSFER_FAIL())
+    dispatch(TRANSFER_FAIL());
   }
-
-
 }
+
+export const makeBuyOrder = async (provider: ethers.BrowserProvider, exchange: ethers.Contract, tokens: ethers.Contract[], order: any, dispatch: Dispatch) => {
+  let transaction;
+
+  try {
+
+    const tokenGet = await tokens[0].getAddress();
+    const amountGet: any = ethers.parseUnits((order.amount).toString(), 18);
+    const tokenGive = await tokens[1].getAddress();
+    const amountGive: any = ethers.parseEther((order.amount * order.price).toString());
+
+    const signer = await provider.getSigner();
+    dispatch(NEW_ORDER_REQUEST());
+    transaction = await exchange.connect(signer).makeOrder(tokenGet, amountGet, tokenGive, amountGive);
+
+    await transaction.wait();
+
+  } catch (error) {
+
+    dispatch(NEW_ORDER_FAIL());
+  }
+}
+
+export const makeSellOrder = async (provider: ethers.BrowserProvider, exchange: ethers.Contract, tokens: ethers.Contract[], order: any, dispatch: Dispatch) => {
+  let transaction;
+
+  try {
+
+    const tokenGet = await tokens[1].getAddress();
+    const amountGet: any = ethers.parseEther((order.amount * order.price).toString());
+    const tokenGive = await tokens[0].getAddress();
+    const amountGive: any = ethers.parseUnits((order.amount).toString(), 18);
+
+    const signer = await provider.getSigner();
+    dispatch(NEW_ORDER_REQUEST());
+    transaction = await exchange.connect(signer).makeOrder(tokenGet, amountGet, tokenGive, amountGive);
+
+    await transaction.wait();
+
+  } catch (error) {
+
+    dispatch(NEW_ORDER_FAIL());
+  }
+}
+
+
+

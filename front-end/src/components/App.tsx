@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Navbar from "./Navbar";
 import Markets from "./Markets"
 import Balance from "./Balance";
+import Order from "./Order";
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -68,7 +69,7 @@ const App: React.FC = () => {
           <Markets />
 
           <Balance />
-          {/* Order */}
+          <Order />
 
         </section>
         <section className="exchange__section--right grid">

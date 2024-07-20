@@ -100,7 +100,10 @@ contract Exchange {
         address _tokenGive,
         uint256 _amountGive
     ) public {
-        require(balanceOf(_tokenGive, msg.sender) >= _amountGive);
+        require(
+            balanceOf(_tokenGive, msg.sender) >= _amountGive,
+            "not enough balance"
+        );
 
         orderCount++;
         orders[orderCount] = _Order(
